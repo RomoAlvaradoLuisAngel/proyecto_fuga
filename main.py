@@ -1,6 +1,7 @@
-def main():
-    print("Hello from proyecto-fuga!")
+import flet as ft
 
-
-if __name__ == "__main__":
-    main()
+def main(page: ft.Page):
+    page.title = "Proyecto Fuga"
+    page.add(ft.Text("¡Bienvenido al Proyecto Fuga!"))
+    
+ft.app(target=main)
