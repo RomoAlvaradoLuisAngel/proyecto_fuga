@@ -6,4 +6,7 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "flet>=0.85.0",
+    "flet-geolocator>=0.85.0",
+    "flet-permission-handler>=0.85.0",
+    "flet-webview>=0.85.0",
 ]
