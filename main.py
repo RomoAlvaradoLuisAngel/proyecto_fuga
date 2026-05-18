@@ -51,27 +51,19 @@ def main(page : ft.Page):
     )
 
     page.add(btn_entrar)
-    
-        
     geo = Geolocator()
     page.services.append(geo)
-
     async def abrir_mapa(e):
-
         pos = await geo.get_current_position()
-
         if not pos:
             page.add(ft.Text("No se pudo obtener ubicación"))
             return
-
         url = (
             f"https://www.openstreetmap.org/"
             f"?mlat={pos.latitude}&mlon={pos.longitude}"
             f"#map=16/{pos.latitude}/{pos.longitude}"
         )
-
         webbrowser.open(url)
-
     page.add(
         ft.Button("Abrir mapa", on_click=abrir_mapa)
     )
