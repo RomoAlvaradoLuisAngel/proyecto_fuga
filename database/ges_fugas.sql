@@ -28,11 +28,14 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `reporte_fugas` (
-  `id_reporte` int(11) NOT NULL,
+  `id_reporte` int(11) NOT NULL AUTO_INCREMENT,
   `descripcion` varchar(1000) NOT NULL,
   `fecha_reporte` datetime NOT NULL,
   `estado` varchar(400) NOT NULL,
-  `direccion` varchar(1000) NOT NULL
+  `direccion` varchar(1000) NOT NULL,
+  `latitud` DECIMAL(10,8),
+  `longitud` DECIMAL(11,8),
+  PRIMARY KEY (`id_reporte`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
