@@ -1,5 +1,5 @@
 import flet as ft
-from flet_geolocator import Geolocator
+import flet_geolocator as ftg
 import webbrowser
 import mysql.connector
 
@@ -10,70 +10,63 @@ conexion = mysql.connector.connect(
     database="ges_fugas"
 )
 
-def main(page : ft.Page):
+async def main(page : ft.Page):
     page.title="BlueLeak"
     page.vertical_alignment=ft.MainAxisAlignment.CENTER
     page.horizontal_alignment=ft.CrossAxisAlignment.CENTER
-    page.padding=30
+    page.padding=0
     page.bgcolor = "#00B0C8"
     
-    page.add(ft.Text("¡Bienvenido a blueLeak!"))
+    geo = ftg.Geolocator()
+    page.services.append(geo)
     
-    def mostrar_pantalla_principal():
+    latitud = None
+    longitud = None
+    
+    async def abrir_mapa(e):
+        nonlocal latitud, longitud
+        ft.Text("Öbteniendo ubicacion, espere...")
+        page.update()
+        try: 
+            await geo.request_permission()
+            pos = await geo.get_current_position()
+            if not pos:
+                page.add(ft.Text("No se pudo obtener ubicación"))
+                return
+            latitud = pos.latitude
+            longitud = pos.longitude
+            url = (f"https://www.google.com/maps?q={latitud},{longitud}")
+            webbrowser.open(url)
+        except Exception as ex:
+            page.add(ft.Text(f"Error al obtener ubicación: {ex}"))
+            page.update()
+    
+    def mostrar_pantalla_principal(e):
         page.clean()
-        page.add(ft.Text("Hola de prueba"))
-        page.navigation_bar=ft.NavigationBar(
-            destinations=[
-                ft.NavigationBarDestination(icon=ft.Icons.HOME, label="Inicio"),
-                ft.NavigationBarDestination(icon=ft.Icons.INFO, label="Informacion"),
-                ft.NavigationBarDestination(icon=ft.Icons.PERSON, label="Inicio de sesion"),
-            ],
-            on_change = lambda e: print(f"Seleccionado: {e.control.selected_index}")
-        )
         
-        page.add(
-            ft.AppBar(
+        page.navigation_bar=ft.NavigationBar(
+                destinations=[
+                    ft.NavigationBarDestination(icon=ft.Icons.HOME, label="Inicio"),
+                    ft.NavigationBarDestination(icon=ft.Icons.INFO, label="Informacion"),
+                    ft.NavigationBarDestination(icon=ft.Icons.PERSON, label="Inicio de sesion"),
+                ],
+                on_change = lambda e: print(f"Seleccionado: {e.control.selected_index}")
+            )
+        page.appbar = ft.AppBar(
                 title=ft.Text("Panel principal"),
                 bgcolor=ft.Colors.BLUE_900,
-                color=ft.Colors.WHITE,
-                automatically_imply_leading=False
-            ),
-            ft.Column(
-                [
-                    ft.Icon(ft.Icons.BOLT, color=ft.Colors.YELLOW, size=100),
-                    ft.Text("Bienvenido al sistema.", color=ft.Colors.WHITE),
-                    ft.Text("Has iniciado sesion correctamente.", color=ft.Colors.WHITE)
-                ],
-                expand=True,
-                alignment=ft.MainAxisAlignment.CENTER,
-                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                color=ft.Colors.WHITE
+                )
+        page.add(
+                ft.Text("¡Bienvenido a BlueLeak!", size=24, weight=ft.FontWeight.BOLD, color=ft.Colors.BLUE_900),
+                ft.Button("Abrir mapa.", on_click=abrir_mapa, bgcolor=ft.Colors.BLUE_400, color=ft.Colors.WHITE)
             )
-        )
         page.update()
     
-    btn_entrar = ft.ElevatedButton(
-        content="Entrar a la aplicación",
-        bgcolor=ft.Colors.GREEN_400,
-        color=ft.Colors.WHITE,
-        on_click=mostrar_pantalla_principal
-    )
-
-    page.add(btn_entrar)
-    geo = Geolocator()
-    page.services.append(geo)
-    async def abrir_mapa(e):
-        pos = await geo.get_current_position()
-        if not pos:
-            page.add(ft.Text("No se pudo obtener ubicación"))
-            return
-        url = (
-            f"https://www.openstreetmap.org/"
-            f"?mlat={pos.latitude}&mlon={pos.longitude}"
-            f"#map=16/{pos.latitude}/{pos.longitude}"
-        )
-        webbrowser.open(url)
     page.add(
-        ft.Button("Abrir mapa", on_click=abrir_mapa)
+        ft.Icon(ft.Icons.WATER_DROP, size=60, color=ft.Colors.WHITE),
+        ft.Text("¡Bienvenido a BlueLeak!", size=24, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE),
+        ft.Button("Entrar a la aplicacion", on_click=mostrar_pantalla_principal, bgcolor=ft.Colors.BLUE_400, color=ft.Colors.WHITE)
     )
 
     
