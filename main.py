@@ -91,7 +91,8 @@ async def main(page : ft.Page):
             controls=[
                 ft.Icon(ft.Icons.WATER_DROP, size=60, color=ft.Colors.BLUE_900),
                 ft.Text("¡Bienvenido a BlueLeak!", size=24, weight=ft.FontWeight.BOLD, color=ft.Colors.BLUE_900),
-                ft.ElevatedButton(content="Agregar reporte", bgcolor=ft.Colors.BLUE_400, color=ft.Colors.WHITE, on_click=abrir_dialog)
+                ft.ElevatedButton(content="Agregar reporte", bgcolor=ft.Colors.BLUE_400, color=ft.Colors.WHITE, on_click=abrir_dialog),
+                ft.Text("Nota: El reporte se visualiza en reportes.", size=12)
             ],
             alignment=ft.MainAxisAlignment.CENTER,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -120,13 +121,10 @@ async def main(page : ft.Page):
             )
 
         
-    def inicio_sesion():
+    def repo():
         return ft.Column(
             controls=[
-            ft.Text("Inicio de sesión", size=24, weight=ft.FontWeight.BOLD, color=ft.Colors.BLUE_900),
-            ft.TextField(label="Usuario", width=200),
-            ft.TextField(label="Contraseña", width=200, password=True),
-            ft.Button("Iniciar sesión", bgcolor=ft.Colors.BLUE_400, color=ft.Colors.WHITE)
+            ft.Text("Visualizador de reportes", size=24, weight=ft.FontWeight.BOLD, color=ft.Colors.BLUE_900),
         ],
             alignment=ft.MainAxisAlignment.CENTER,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -142,7 +140,7 @@ async def main(page : ft.Page):
         elif opcion == 1:
             vista_contenedor.content=informacion()
         elif opcion == 2:
-            vista_contenedor.content=inicio_sesion()
+            vista_contenedor.content=repo()
         page.update()
 
     def mostrar_pantalla_principal(e):
@@ -160,7 +158,7 @@ async def main(page : ft.Page):
                 destinations=[
                     ft.NavigationBarDestination(icon=ft.Icons.HOME, label="Inicio"),
                     ft.NavigationBarDestination(icon=ft.Icons.INFO, label="Informacion"),
-                    ft.NavigationBarDestination(icon=ft.Icons.PERSON, label="Inicio de sesion"),
+                    ft.NavigationBarDestination(icon=ft.Icons.PERSON, label="Reportes"),
                 ],
                 on_change = cambiar_pantalla
             )
