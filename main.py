@@ -4,12 +4,13 @@ import webbrowser
 import mysql.connector
 from datetime import datetime
 
-conexion = mysql.connector.connect(
-    host="127.0.0.1",
-    user="root",
-    password="",
-    database="ges_fugas"
-)
+def conexion():
+    return mysql.connector.connect(
+            host="127.0.0.1",
+            user="root",
+            password="",
+            database="ges_fugas"
+        )
 
 async def main(page : ft.Page):
     page.title="BlueLeak"
@@ -45,11 +46,52 @@ async def main(page : ft.Page):
             page.update()
             
     def inicio():
+        def abrir_dialog(e):
+            txt_descripcion = ft.TextField(label="Escriba una descripcion de la fuga.", multiline=True, color=ft.Colors.BLUE_900)
+            txt_direccion = ft.TextField(label="Escriba la direccion de la fuga.", multiline=True, color=ft.Colors.BLUE_900)
+            mensaje = ft.Text("", color=ft.Colors.RED_400)
+            
+            def enviar_repo(e):
+                if not txt_descripcion.value or not txt_direccion.value:
+                    mensaje.value = "Por favor acompleta todos los campos."
+                    page.update()
+                try:
+                    db = conexion()
+                    cursor = db.cursor()
+                    cursor.execute(
+                        "INSERT INTO reporte_fugas (descripcion, direccion, latitud, longitud, fecha_reporte) VALUES (%s, %s, %s, %s, %s)",
+                        (txt_descripcion.value, txt_direccion.value, latitud, longitud, datetime.now()))
+                    db.commit()
+                    db.close()
+                    mensaje.color = ft.Colors.GREEN_400
+                    mensaje.value = "Reporte enviado con exito" 
+                except Exception as ex:
+                    mensaje.value = f"Error al enviar reporte: {ex}" 
+                    page.update()
+                    
+            carta = ft.AlertDialog(
+                title = ft.Text("Crear reporte", color = ft.Colors.BLUE_900),
+                content = ft.Column(
+                    controls=[txt_descripcion,txt_direccion,mensaje],
+                    ),
+                    actions=[
+                        ft.Button(content="Agregar", on_click=enviar_repo,bgcolor = ft.Colors.GREEN_400, color=ft.Colors.WHITE),
+                        ft.Button(content="Cancelar", bgcolor=ft.Colors.RED_400, color=ft.Colors.WHITE)
+                    ]
+                )
+            page.overlay.append(carta) 
+            carta.open = True
+            page.update()
+                
+
+                
+                
+                
         return ft.Column(
             controls=[
                 ft.Icon(ft.Icons.WATER_DROP, size=60, color=ft.Colors.BLUE_900),
                 ft.Text("¡Bienvenido a BlueLeak!", size=24, weight=ft.FontWeight.BOLD, color=ft.Colors.BLUE_900),
-                ft.ElevatedButton(content="Agregar reporte", bgcolor=ft.Colors.BLUE_400, color=ft.Colors.WHITE)
+                ft.ElevatedButton(content="Agregar reporte", bgcolor=ft.Colors.BLUE_400, color=ft.Colors.WHITE, on_click=abrir_dialog)
             ],
             alignment=ft.MainAxisAlignment.CENTER,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
