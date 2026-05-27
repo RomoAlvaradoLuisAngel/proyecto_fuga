@@ -12,6 +12,7 @@ def conexion():
             database="ges_fugas"
         )
 
+
 async def main(page : ft.Page):
     page.title="BlueLeak"
     page.vertical_alignment=ft.MainAxisAlignment.CENTER
@@ -69,18 +70,22 @@ async def main(page : ft.Page):
                     mensaje.value = f"Error al enviar reporte: {ex}" 
                     page.update()
                     
+            def cerrar_dialogo(e):
+                carta.open = False
+                page.update()        
+                    
             carta = ft.AlertDialog(
-    title=ft.Text("Crear reporte", color=ft.Colors.BLUE_900),
-
-    content=ft.Column(
-        controls=[txt_descripcion, txt_direccion, mensaje],
-        tight=True
-    ),
+            title=ft.Text("Crear reporte", color=ft.Colors.BLUE_900),
+            content=ft.Column(
+                controls=[txt_descripcion, txt_direccion, mensaje],
+                tight=True
+            ),
+    
 
     actions=[
         ft.Button(content="Agregar", on_click=enviar_repo, bgcolor=ft.Colors.GREEN_400, color=ft.Colors.WHITE),
 
-        ft.Button(content="Cancelar", bgcolor=ft.Colors.RED_400, color=ft.Colors.WHITE)
+        ft.Button(content="Cancelar", bgcolor=ft.Colors.RED_400, color=ft.Colors.WHITE, on_click = cerrar_dialogo)
     ]
 )
             page.overlay.append(carta) 
