@@ -70,28 +70,28 @@ async def main(page : ft.Page):
                     page.update()
                     
             carta = ft.AlertDialog(
-                title = ft.Text("Crear reporte", color = ft.Colors.BLUE_900),
-                content = ft.Column(
-                    controls=[txt_descripcion,txt_direccion,mensaje],
-                    ),
-                    actions=[
-                        ft.Button(content="Agregar", on_click=enviar_repo,bgcolor = ft.Colors.GREEN_400, color=ft.Colors.WHITE),
-                        ft.Button(content="Cancelar", bgcolor=ft.Colors.RED_400, color=ft.Colors.WHITE)
-                    ]
-                )
+    title=ft.Text("Crear reporte", color=ft.Colors.BLUE_900),
+
+    content=ft.Column(
+        controls=[txt_descripcion, txt_direccion, mensaje],
+        tight=True
+    ),
+
+    actions=[
+        ft.Button(content="Agregar", on_click=enviar_repo, bgcolor=ft.Colors.GREEN_400, color=ft.Colors.WHITE),
+
+        ft.Button(content="Cancelar", bgcolor=ft.Colors.RED_400, color=ft.Colors.WHITE)
+    ]
+)
             page.overlay.append(carta) 
             carta.open = True
             page.update()
-                
-
-                
-                
-                
+                                
         return ft.Column(
             controls=[
                 ft.Icon(ft.Icons.WATER_DROP, size=60, color=ft.Colors.BLUE_900),
                 ft.Text("¡Bienvenido a BlueLeak!", size=24, weight=ft.FontWeight.BOLD, color=ft.Colors.BLUE_900),
-                ft.ElevatedButton(content="Agregar reporte", bgcolor=ft.Colors.BLUE_400, color=ft.Colors.WHITE, on_click=abrir_dialog),
+                ft.Button(content="Agregar reporte", bgcolor=ft.Colors.BLUE_400, color=ft.Colors.WHITE, on_click=abrir_dialog),
                 ft.Text("Nota: El reporte se visualiza en reportes.", size=12)
             ],
             alignment=ft.MainAxisAlignment.CENTER,
@@ -122,15 +122,132 @@ async def main(page : ft.Page):
 
         
     def repo():
-        return ft.Column(
-            controls=[
-            ft.Text("Visualizador de reportes", size=24, weight=ft.FontWeight.BOLD, color=ft.Colors.BLUE_900),
-        ],
-            alignment=ft.MainAxisAlignment.CENTER,
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            expand=True
-        )
+        tarjetas = []
+        try:
+            db = conexion()
+            cursor = db.cursor()
+            cursor.execute("""
+                SELECT descripcion, direccion, fecha_reporte
+                FROM reporte_fugas
+            """)
+            reportes = cursor.fetchall()
+            db.close()
 
+            if reportes:
+                for reporte in reportes:
+                    descripcion = reporte[0]
+                    direccion = reporte[1]
+                    fecha = reporte[2]
+
+                    tarjeta = ft.Card(elevation=8,margin=10,
+                        content=ft.Container(
+                            bgcolor=ft.Colors.WHITE,
+                            border_radius=15,
+                            padding=15,
+                            content=ft.Column(spacing=10,controls=[ft.Row(
+                                        controls=[
+
+                                            ft.Icon(
+                                                ft.Icons.WATER_DROP,
+                                                color=ft.Colors.BLUE_400,
+                                                size=30
+                                            ),
+
+                                            ft.Text(
+                                                "Reporte de fuga",
+                                                size=20,
+                                                weight=ft.FontWeight.BOLD,
+                                                color=ft.Colors.BLUE_900
+                                            )
+                                        ]
+                                    ),
+
+                                    ft.Divider(),
+
+                                    ft.Text( f"Descripción: {descripcion}",
+                                        weight=ft.FontWeight.BOLD,
+                                        color=ft.Colors.BLUE_900
+                                    ),
+
+                                    ft.Text(
+                                        descripcion,
+                                        size=15,
+                                        color=ft.Colors.BLACK
+                                    ),
+
+                                    ft.Text(
+                                        "Dirección:",
+                                        weight=ft.FontWeight.BOLD,
+                                        color=ft.Colors.BLUE_900
+                                    ),
+
+                                    ft.Text(
+                                        direccion,
+                                        size=15,
+                                        color=ft.Colors.BLACK
+                                    ),
+
+                                    ft.Text(
+                                        "Fecha:",
+                                        weight=ft.FontWeight.BOLD,
+                                        color=ft.Colors.BLUE_900
+                                    ),
+
+                                    ft.Text(
+                                        str(fecha),
+                                        size=13,
+                                        color=ft.Colors.GREY_700
+                                    )
+                                ]
+                            )
+                        )
+                    )
+
+                    tarjetas.append(tarjeta)
+
+            else:
+
+                tarjetas.append(
+
+                    ft.Text(
+                        "No hay reportes registrados",
+                        color=ft.Colors.WHITE,
+                        size=18
+                    )
+                )
+
+        except Exception as ex:
+
+            tarjetas.append(
+
+                ft.Text(
+                    f"Error: {ex}",
+                    color=ft.Colors.RED
+                )
+            )
+
+        return ft.Column(
+
+            controls=[
+
+                ft.Text(
+                    "Visualizador de reportes",
+                    size=28,
+                    weight=ft.FontWeight.BOLD,
+                    color=ft.Colors.WHITE
+                ),
+
+                ft.Column(
+                    controls=tarjetas,
+                    scroll=ft.ScrollMode.AUTO,
+                    expand=True
+                )
+            ],
+
+            expand=True,
+            scroll=ft.ScrollMode.AUTO,
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER
+        )
 
     def cambiar_pantalla(e):
         opcion = e.control.selected_index
