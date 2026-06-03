@@ -127,132 +127,165 @@ async def main(page : ft.Page):
 
         
     def repo():
-        tarjetas = []
-        try:
-            db = conexion()
-            cursor = db.cursor()
-            cursor.execute("""
-                SELECT descripcion, direccion, fecha_reporte
-                FROM reporte_fugas
-            """)
-            reportes = cursor.fetchall()
-            db.close()
+        def eliminar(id_reporte):
+            conn = None
+            cursor = None
+            try:
+                conn = conexion()
+                cursor = conn.cursor()
+                cursor.execute(
+                    "DELETE FROM reporte_fugas WHERE id_reporte = %s",
+                    (id_reporte,)
+                )
+                conn.commit()
+                conn.close()
+                vista_contenedor.content = repo()
+                page.update()
 
-            if reportes:
-                for reporte in reportes:
-                    descripcion = reporte[0]
-                    direccion = reporte[1]
-                    fecha = reporte[2]
+            except Exception as e:
+                print("ERROR ELIMINAR reporte:", e)
+                return False
 
-                    tarjeta = ft.Card(elevation=8,margin=10,
-                        content=ft.Container(
-                            bgcolor=ft.Colors.WHITE,
-                            border_radius=15,
-                            padding=15,
-                            content=ft.Column(spacing=10,controls=[ft.Row(
-                                        controls=[
+            finally:
+                if cursor:
+                    cursor.close()
+                if conn:
+                    conn.close()
+                    
+        def cargar():
+            tarjetas = []
+            try:
+                db = conexion()
+                cursor = db.cursor()
+                cursor.execute("""
+                    SELECT id_reporte, descripcion, direccion, fecha_reporte
+                    FROM reporte_fugas
+                """)
+                reportes = cursor.fetchall()
+                db.close()
 
-                                            ft.Icon(
-                                                ft.Icons.WATER_DROP,
-                                                color=ft.Colors.BLUE_400,
-                                                size=30
-                                            ),
+                if reportes:
+                    for reporte in reportes:
+                        id_reporte = reporte[0]
+                        descripcion = reporte[1]
+                        direccion = reporte[2]
+                        fecha = reporte[3]
 
-                                            ft.Text(
-                                                "Reporte de fuga",
-                                                size=20,
-                                                weight=ft.FontWeight.BOLD,
-                                                color=ft.Colors.BLUE_900
-                                            )
-                                        ]
-                                    ),
+                        tarjeta = ft.Card(elevation=8,margin=10,
+                            content=ft.Container(
+                                bgcolor=ft.Colors.WHITE,
+                                border_radius=15,
+                                padding=15,
+                                content=ft.Column(spacing=10,controls=[ft.Row(
+                                            controls=[
 
-                                    ft.Divider(),
+                                                ft.Icon(
+                                                    ft.Icons.WATER_DROP,
+                                                    color=ft.Colors.BLUE_400,
+                                                    size=30
+                                                ),
 
-                                    ft.Text( f"Descripción: {descripcion}",
-                                        weight=ft.FontWeight.BOLD,
-                                        color=ft.Colors.BLUE_900
-                                    ),
+                                                ft.Text(
+                                                    "Reporte de fuga",
+                                                    size=20,
+                                                    weight=ft.FontWeight.BOLD,
+                                                    color=ft.Colors.BLUE_900
+                                                )
+                                            ]
+                                        ),
 
-                                    ft.Text(
-                                        descripcion,
-                                        size=15,
-                                        color=ft.Colors.BLACK
-                                    ),
+                                        ft.Divider(),
 
-                                    ft.Text(
-                                        "Dirección:",
-                                        weight=ft.FontWeight.BOLD,
-                                        color=ft.Colors.BLUE_900
-                                    ),
+                                        ft.Text( f"Descripción: {descripcion}",
+                                            weight=ft.FontWeight.BOLD,
+                                            color=ft.Colors.BLUE_900
+                                        ),
 
-                                    ft.Text(
-                                        direccion,
-                                        size=15,
-                                        color=ft.Colors.BLACK
-                                    ),
+                                        ft.Text(
+                                            descripcion,
+                                            size=15,
+                                            color=ft.Colors.BLACK
+                                        ),
 
-                                    ft.Text(
-                                        "Fecha:",
-                                        weight=ft.FontWeight.BOLD,
-                                        color=ft.Colors.BLUE_900
-                                    ),
+                                        ft.Text(
+                                            "Dirección:",
+                                            weight=ft.FontWeight.BOLD,
+                                            color=ft.Colors.BLUE_900
+                                        ),
 
-                                    ft.Text(
-                                        str(fecha),
-                                        size=13,
-                                        color=ft.Colors.GREY_700
-                                    )
-                                ]
+                                        ft.Text(
+                                            direccion,
+                                            size=15,
+                                            color=ft.Colors.BLACK
+                                        ),
+
+                                        ft.Text(
+                                            "Fecha:",
+                                            weight=ft.FontWeight.BOLD,
+                                            color=ft.Colors.BLUE_900
+                                        ),
+
+                                        ft.Text(
+                                            str(fecha),
+                                            size=13,
+                                            color=ft.Colors.GREY_700
+                                        ),
+                                        ft.ElevatedButton("eliminar", on_click=lambda e, id=id_reporte: eliminar(id), bgcolor=ft.Colors.RED_400, color=ft.Colors.WHITE),
+                                    ]
+                                )
                             )
+                        )
+                        
+                        
+
+                        tarjetas.append(tarjeta)
+
+                else:
+
+                    tarjetas.append(
+
+                        ft.Text(
+                            "No hay reportes registrados",
+                            color=ft.Colors.WHITE,
+                            size=18
                         )
                     )
 
-                    tarjetas.append(tarjeta)
-
-            else:
+            except Exception as ex:
 
                 tarjetas.append(
 
                     ft.Text(
-                        "No hay reportes registrados",
-                        color=ft.Colors.WHITE,
-                        size=18
+                        f"Error: {ex}",
+                        color=ft.Colors.RED
                     )
                 )
 
-        except Exception as ex:
+            return ft.Column(
 
-            tarjetas.append(
+                controls=[
 
-                ft.Text(
-                    f"Error: {ex}",
-                    color=ft.Colors.RED
-                )
+                    ft.Text(
+                        "Visualizador de reportes",
+                        size=28,
+                        weight=ft.FontWeight.BOLD,
+                        color=ft.Colors.WHITE
+                    ),
+
+                    ft.Column(
+                        controls=tarjetas,
+                        scroll=ft.ScrollMode.AUTO,
+                        expand=True
+                    )
+                ],
+
+                expand=True,
+                scroll=ft.ScrollMode.AUTO,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER
             )
+        return cargar()
 
-        return ft.Column(
 
-            controls=[
-
-                ft.Text(
-                    "Visualizador de reportes",
-                    size=28,
-                    weight=ft.FontWeight.BOLD,
-                    color=ft.Colors.WHITE
-                ),
-
-                ft.Column(
-                    controls=tarjetas,
-                    scroll=ft.ScrollMode.AUTO,
-                    expand=True
-                )
-            ],
-
-            expand=True,
-            scroll=ft.ScrollMode.AUTO,
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER
-        )
 
     def cambiar_pantalla(e):
         opcion = e.control.selected_index
