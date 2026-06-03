@@ -196,7 +196,7 @@ async def main(page : ft.Page):
 
                                         ft.Divider(),
 
-                                        ft.Text( f"Descripción: {descripcion}",
+                                        ft.Text( f"Descripción:",
                                             weight=ft.FontWeight.BOLD,
                                             color=ft.Colors.BLUE_900
                                         ),
