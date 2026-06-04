@@ -305,7 +305,7 @@ async def main(page : ft.Page):
                 bgcolor=ft.Colors.BLUE_900,
                 color=ft.Colors.WHITE,
                 actions = [
-                            ft.IconButton(ft.Icons.MAP, on_click=abrir_mapa, tooltip="Mapa", icon_size=80 ),
+                            ft.IconButton(ft.Icons.MAP, on_click=abrir_mapa, tooltip="Mapa", icon_size=40 ),
                 ]
                 )        
         page.navigation_bar=ft.NavigationBar(
