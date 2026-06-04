@@ -230,7 +230,7 @@ async def main(page : ft.Page):
                                             size=13,
                                             color=ft.Colors.GREY_700
                                         ),
-                                        ft.ElevatedButton("eliminar", on_click=lambda e, id=id_reporte: eliminar(id), bgcolor=ft.Colors.RED_400, color=ft.Colors.WHITE),
+                                        ft.Button("eliminar", on_click=lambda e, id=id_reporte: eliminar(id), bgcolor=ft.Colors.RED_400, color=ft.Colors.WHITE),
                                     ]
                                 )
                             )
@@ -305,7 +305,7 @@ async def main(page : ft.Page):
                 bgcolor=ft.Colors.BLUE_900,
                 color=ft.Colors.WHITE,
                 actions = [
-                            ft.IconButton(ft.Icons.MAP, on_click=abrir_mapa, tooltip="Mapa"),
+                            ft.IconButton(ft.Icons.MAP, on_click=abrir_mapa, tooltip="Mapa", icon_size=80 ),
                 ]
                 )        
         page.navigation_bar=ft.NavigationBar(
