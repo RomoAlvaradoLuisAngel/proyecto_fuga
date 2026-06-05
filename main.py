@@ -50,18 +50,24 @@ async def main(page : ft.Page):
         def abrir_dialog(e):
             txt_descripcion = ft.TextField(label="Escriba una descripcion de la fuga.", multiline=True, color=ft.Colors.BLUE_900)
             txt_direccion = ft.TextField(label="Escriba la direccion de la fuga.", multiline=True, color=ft.Colors.BLUE_900)
+            txt_estado = ft.Dropdown(label = "Estado de la fuga", options=[
+                ft.dropdown.Option("Completamente rota"),
+                ft.dropdown.Option("Un poco rota"),
+                ft.dropdown.Option("Mal mantenimiento"),
+            ])
             mensaje = ft.Text("", color=ft.Colors.RED_400)
             
             def enviar_repo(e):
-                if not txt_descripcion.value or not txt_direccion.value:
+                if not txt_descripcion.value or not txt_direccion.value or not txt_estado.value:
                     mensaje.value = "Por favor acompleta todos los campos."
                     page.update()
+                    return
                 try:
                     db = conexion()
                     cursor = db.cursor()
                     cursor.execute(
-                        "INSERT INTO reporte_fugas (descripcion, direccion, latitud, longitud, fecha_reporte) VALUES (%s, %s, %s, %s, %s)",
-                        (txt_descripcion.value, txt_direccion.value, latitud, longitud, datetime.now()))
+                        "INSERT INTO reporte_fugas (descripcion, direccion, estado, latitud, longitud, fecha_reporte) VALUES (%s, %s, %s, %s, %s)",
+                        (txt_descripcion.value, txt_direccion.value, txt_estado.value, latitud.value, longitud.value, datetime.now()))
                     db.commit()
                     db.close()
                     mensaje.color = ft.Colors.GREEN_400
@@ -77,7 +83,7 @@ async def main(page : ft.Page):
             carta = ft.AlertDialog(
             title=ft.Text("Crear reporte", color=ft.Colors.BLUE_900),
             content=ft.Column(
-                controls=[txt_descripcion, txt_direccion, mensaje],
+                controls=[txt_descripcion, txt_direccion, txt_estado, mensaje],
                 tight=True
             ),
     
@@ -85,7 +91,7 @@ async def main(page : ft.Page):
     actions=[
         ft.Button(content="Agregar", on_click=enviar_repo, bgcolor=ft.Colors.GREEN_400, color=ft.Colors.WHITE),
 
-        ft.Button(content="Cancelar", bgcolor=ft.Colors.RED_400, color=ft.Colors.WHITE, on_click = cerrar_dialogo)
+        ft.Button(content="Cerrar", bgcolor=ft.Colors.RED_400, color=ft.Colors.WHITE, on_click = cerrar_dialogo)
     ]
 )
             page.overlay.append(carta) 
@@ -161,7 +167,7 @@ async def main(page : ft.Page):
                 db = conexion()
                 cursor = db.cursor()
                 cursor.execute("""
-                    SELECT id_reporte, descripcion, direccion, fecha_reporte
+                    SELECT id_reporte, descripcion, direccion, estado, fecha_reporte
                     FROM reporte_fugas
                 """)
                 reportes = cursor.fetchall()
@@ -172,7 +178,8 @@ async def main(page : ft.Page):
                         id_reporte = reporte[0]
                         descripcion = reporte[1]
                         direccion = reporte[2]
-                        fecha = reporte[3]
+                        estado = reporte[3]
+                        fecha = reporte[4]
 
                         tarjeta = ft.Card(elevation=8,margin=10,
                             content=ft.Container(
@@ -181,7 +188,6 @@ async def main(page : ft.Page):
                                 padding=15,
                                 content=ft.Column(spacing=10,controls=[ft.Row(
                                             controls=[
-
                                                 ft.Icon(
                                                     ft.Icons.WATER_DROP,
                                                     color=ft.Colors.BLUE_400,
@@ -196,7 +202,6 @@ async def main(page : ft.Page):
                                                 )
                                             ]
                                         ),
-
                                         ft.Divider(),
 
                                         ft.Text( f"Descripción:",
@@ -218,6 +223,18 @@ async def main(page : ft.Page):
 
                                         ft.Text(
                                             direccion,
+                                            size=15,
+                                            color=ft.Colors.BLACK
+                                        ),
+                                        
+                                        ft.Text(
+                                            "Estado de la fuga",
+                                            weight=ft.FontWeight.BOLD,
+                                            color=ft.Colors.BLUE_900
+                                        ),
+                                        
+                                        ft.Text(
+                                            estado,
                                             size=15,
                                             color=ft.Colors.BLACK
                                         ),
@@ -284,7 +301,6 @@ async def main(page : ft.Page):
                         expand=True
                     )
                 ],
-
                 expand=True,
                 scroll=ft.ScrollMode.AUTO,
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER
