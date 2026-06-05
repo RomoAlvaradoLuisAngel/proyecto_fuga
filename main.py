@@ -111,9 +111,9 @@ async def main(page : ft.Page):
             ft.Icon(ft.Icons.INFO, size=60, color=ft.Colors.WHITE),
             ft.Text("Información de la aplicación", size=24, weight=ft.FontWeight.BOLD, color=ft.Colors.BLUE_900),
             ft.Text("BlueLeak es una aplicación diseñada para ayudar a los usuarios a reportar fugas de agua en su área. Con esta aplicación, los usuarios pueden compartir información sobre la ubicación de las fugas, lo que permite a las autoridades locales tomar medidas rápidas para solucionar el problema y reducir el desperdicio de agua.", size=16, color=ft.Colors.WHITE),
-            ft.Text("Que es una fuga de agua?", size=24, weight=ft.FontWeight.BOLD, color=ft.Colors.BLUE_900),
+            ft.Text("¿Qué es una fuga de agua?", size=24, weight=ft.FontWeight.BOLD, color=ft.Colors.BLUE_900),
             ft.Text("Una fuga de agua es una pérdida no deseada de agua que ocurre cuando el agua se escapa de las tuberías, grifos, o cualquier otro sistema de plomería. Las fugas pueden ser causadas por una variedad de factores, como tuberías corroídas, conexiones sueltas, o daños físicos. Las fugas de agua pueden resultar en un desperdicio significativo de agua, así como en daños a la propiedad si no se abordan a tiempo.", size=16, color=ft.Colors.WHITE),
-            ft.Text("Como ubicar una fuga de agua?", size=24, weight=ft.FontWeight.BOLD, color=ft.Colors.BLUE_900),
+            ft.Text("¿Comó ubicar una fuga de agua?", size=24, weight=ft.FontWeight.BOLD, color=ft.Colors.BLUE_900),
             ft.Text("Para ubicar una fuga de agua, es importante prestar atención a ciertos signos, como un aumento inexplicable en la factura de agua, manchas de humedad en las paredes o techos, o el sonido de agua corriendo cuando no debería haberlo. También se pueden utilizar herramientas como medidores de flujo o cámaras termográficas para identificar la ubicación exacta de la fuga.", size=16, color=ft.Colors.WHITE),
             ft.Text("¿Cómo reportar una fuga de agua?", size=24, weight=ft.FontWeight.BOLD, color=ft.Colors.BLUE_900),
             ft.Text("Cuando registre una fuga de agua aqui, con su ubicacion exacta, puede ir a levantar la queja en junta municipal de agua.", size=16, color=ft.Colors.WHITE),
@@ -151,6 +151,9 @@ async def main(page : ft.Page):
                     cursor.close()
                 if conn:
                     conn.close()
+                    
+        def modificar(id_reporte):
+            pass
                     
         def cargar():
             tarjetas = []
@@ -230,7 +233,10 @@ async def main(page : ft.Page):
                                             size=13,
                                             color=ft.Colors.GREY_700
                                         ),
-                                        ft.Button("eliminar", on_click=lambda e, id=id_reporte: eliminar(id), bgcolor=ft.Colors.RED_400, color=ft.Colors.WHITE),
+                                        ft.Row([
+                                            ft.Button("Eliminar reporte", on_click=lambda e, id=id_reporte: eliminar(id), bgcolor=ft.Colors.RED_400, color=ft.Colors.WHITE),
+                                            ft.Button("Modificar reporte", bgcolor = ft.Colors.CYAN_400, color=ft.Colors.WHITE)
+                                        ])
                                     ]
                                 )
                             )
