@@ -50,10 +50,14 @@ async def main(page : ft.Page):
         def abrir_dialog(e):
             txt_descripcion = ft.TextField(label="Escriba una descripcion de la fuga.", multiline=True, color=ft.Colors.BLUE_900)
             txt_direccion = ft.TextField(label="Escriba la direccion de la fuga.", multiline=True, color=ft.Colors.BLUE_900)
-            txt_estado = ft.Dropdown(label = "Estado de la fuga", options=[
-                ft.dropdown.Option("Completamente rota"),
-                ft.dropdown.Option("Un poco rota"),
-                ft.dropdown.Option("Mal mantenimiento"),
+            txt_estado = ft.Dropdown(label = "Estado de la fuga", width = 300, options=[
+                ft.dropdown.Option("Completamente rota."),
+                ft.dropdown.Option("Un poco rota."),
+                ft.dropdown.Option("Mal mantenimiento."),
+                ft.dropdown.Option("Fugea menor (goteo)."),
+                ft.dropdown.Option("Fuga mayor (chorro)."),
+                ft.dropdown.Option("En revision."),
+                ft.dropdown.Option("Resuelta.")
             ])
             mensaje = ft.Text("", color=ft.Colors.RED_400)
             
@@ -161,11 +165,15 @@ async def main(page : ft.Page):
         def modificar(id_reporte, descripcion, direccion, estado):
             modi_desc = ft.TextField(label="Descripcion de la fuga", value=descripcion, multiline=True, color=ft.Colors.BLUE_900)
             modi_dire = ft.TextField(label="Direccion de la fuga", value=direccion, multiline=True, color=ft.Colors.BLUE_900)
-            modi_estado = ft.Dropdown(label="Estado",value=estado,
+            modi_estado = ft.Dropdown(label="Estado",value=estado, width = 300,
                                     options=[
-                                            ft.dropdown.Option("Completamente rota"),
-                                            ft.dropdown.Option("Un poco rota"),
-                                            ft.dropdown.Option("Mal mantenimiento"),
+                                            ft.dropdown.Option("Completamente rota."),
+                                            ft.dropdown.Option("Un poco rota."),
+                                            ft.dropdown.Option("Mal mantenimiento."),
+                                            ft.dropdown.Option("Fugea menor (goteo)."),
+                                            ft.dropdown.Option("Fuga mayor (chorro)."),
+                                            ft.dropdown.Option("En revision."),
+                                            ft.dropdown.Option("Resuelta.")
                                         ]
                                     )
             mensaje = ft.Text("", color=ft.Colors.RED_400)
@@ -185,6 +193,25 @@ async def main(page : ft.Page):
                 except Exception as ex:
                     mensaje.value = f"Error al enviar reporte: {ex}" 
                     page.update()
+                    
+            def cerrar(e):
+                modificar.open = False
+                page.update()        
+                    
+            modificar = ft.AlertDialog(
+            title=ft.Text("Modificar reporte", color=ft.Colors.BLUE_900),
+            content=ft.Column(
+                controls=[modi_desc, modi_dire, modi_estado, mensaje],
+                tight=True
+            ),
+            actions=[
+                ft.Button(content="Agregar", on_click=guardar_modi, bgcolor=ft.Colors.GREEN_400, color=ft.Colors.WHITE),
+                ft.Button(content="Cerrar", bgcolor=ft.Colors.RED_400, color=ft.Colors.WHITE, on_click = cerrar)
+            ]
+        )
+            page.overlay.append(modificar) 
+            modificar.open = True
+            page.update()
                     
         def cargar():
             tarjetas = []
@@ -277,7 +304,7 @@ async def main(page : ft.Page):
                                         ),
                                         ft.Row([
                                             ft.Button("Eliminar reporte", on_click=lambda e, id=id_reporte: eliminar(id), bgcolor=ft.Colors.RED_400, color=ft.Colors.WHITE),
-                                            ft.Button("Modificar reporte", bgcolor = ft.Colors.CYAN_400, color=ft.Colors.WHITE)
+                                            ft.Button("Modificar reporte", on_click=lambda e, id=id_reporte, d=descripcion, di=direccion, est=estado: modificar(id, d, di, est), bgcolor = ft.Colors.CYAN_400, color=ft.Colors.WHITE)
                                         ])
                                     ]
                                 )
