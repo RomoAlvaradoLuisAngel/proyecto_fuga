@@ -66,8 +66,8 @@ async def main(page : ft.Page):
                     db = conexion()
                     cursor = db.cursor()
                     cursor.execute(
-                        "INSERT INTO reporte_fugas (descripcion, direccion, estado, latitud, longitud, fecha_reporte) VALUES (%s, %s, %s, %s, %s)",
-                        (txt_descripcion.value, txt_direccion.value, txt_estado.value, latitud.value, longitud.value, datetime.now()))
+                        "INSERT INTO reporte_fugas (descripcion, direccion, estado, latitud, longitud, fecha_reporte) VALUES (%s, %s, %s, %s, %s, %s)",
+                        (txt_descripcion.value, txt_direccion.value, txt_estado.value, latitud, longitud, datetime.now()))
                     db.commit()
                     db.close()
                     mensaje.color = ft.Colors.GREEN_400
@@ -158,8 +158,33 @@ async def main(page : ft.Page):
                 if conn:
                     conn.close()
                     
-        def modificar(id_reporte):
-            pass
+        def modificar(id_reporte, descripcion, direccion, estado):
+            modi_desc = ft.TextField(label="Descripcion de la fuga", value=descripcion, multiline=True, color=ft.Colors.BLUE_900)
+            modi_dire = ft.TextField(label="Direccion de la fuga", value=direccion, multiline=True, color=ft.Colors.BLUE_900)
+            modi_estado = ft.Dropdown(label="Estado",value=estado,
+                                    options=[
+                                            ft.dropdown.Option("Completamente rota"),
+                                            ft.dropdown.Option("Un poco rota"),
+                                            ft.dropdown.Option("Mal mantenimiento"),
+                                        ]
+                                    )
+            mensaje = ft.Text("", color=ft.Colors.RED_400)
+            
+            def guardar_modi():
+                try:
+                    db = conexion()
+                    cursor = db.cursor()
+                    cursor.execute(
+                        "UPDATE reporte_fugas SET descripcion = %s, direccion = %s, estado = %s WHERE id_reporte = %s",
+                        (modi_desc.value, modi_dire.value, modi_estado.value, id_reporte)
+                    )
+                    db.commit()
+                    db.close()
+                    mensaje.color = ft.Colors.GREEN_400
+                    mensaje.value = "Reporte enviado con exito" 
+                except Exception as ex:
+                    mensaje.value = f"Error al enviar reporte: {ex}" 
+                    page.update()
                     
         def cargar():
             tarjetas = []
