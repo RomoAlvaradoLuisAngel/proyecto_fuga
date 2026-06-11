@@ -6,10 +6,11 @@ from datetime import datetime
 
 def conexion():
     return mysql.connector.connect(
-            host="127.0.0.1",
-            user="root",
-            password="",
-            database="ges_fugas"
+            host="bxnr6ckmgzotyxogy2b9-mysql.services.clever-cloud.com",
+            user="un7cvmlah8wanpx8",
+            password="gvwkqRmXTxows2Puiaa9",
+            database="bxnr6ckmgzotyxogy2b9",
+            port=3306
         )
 
 
