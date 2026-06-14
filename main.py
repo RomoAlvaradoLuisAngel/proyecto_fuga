@@ -2,6 +2,7 @@ import flet as ft
 import flet_geolocator as ftg
 import webbrowser
 import mysql.connector
+import traceback
 from datetime import datetime
 
 def conexion():
@@ -10,7 +11,9 @@ def conexion():
             user="un7cvmlah8wanpx8",
             password="gvwkqRmXTxows2Puiaa9",
             database="bxnr6ckmgzotyxogy2b9",
-            port=3306
+            port=3306,
+            use_pure=True,
+            auth_plugin='mysql_native_password'
         )
 
 
@@ -55,7 +58,7 @@ async def main(page : ft.Page):
                 ft.dropdown.Option("Completamente rota."),
                 ft.dropdown.Option("Un poco rota."),
                 ft.dropdown.Option("Mal mantenimiento."),
-                ft.dropdown.Option("Fugea menor (goteo)."),
+                ft.dropdown.Option("Fuga menor (goteo)."),
                 ft.dropdown.Option("Fuga mayor (chorro)."),
                 ft.dropdown.Option("En revision."),
                 ft.dropdown.Option("Resuelta.")
@@ -206,7 +209,7 @@ async def main(page : ft.Page):
                 tight=True
             ),
             actions=[
-                ft.Button(content="Agregar", on_click=guardar_modi, bgcolor=ft.Colors.GREEN_400, color=ft.Colors.WHITE),
+                ft.Button(content="Modificar", on_click=guardar_modi, bgcolor=ft.Colors.GREEN_400, color=ft.Colors.WHITE),
                 ft.Button(content="Cerrar", bgcolor=ft.Colors.RED_400, color=ft.Colors.WHITE, on_click = cerrar)
             ]
         )
@@ -328,14 +331,14 @@ async def main(page : ft.Page):
                     )
 
             except Exception as ex:
-
                 tarjetas.append(
-
                     ft.Text(
-                        f"Error: {ex}",
+                        "Ocurrió un error al cargar los reportes.",
                         color=ft.Colors.RED
                     )
                 )
+
+                print("ERROR REPORTES:", ex)
 
             return ft.Column(
 
